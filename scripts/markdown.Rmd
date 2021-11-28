@@ -8,6 +8,7 @@ output:
     toc_float: true
 bibliography: references.bib
 ---
+<!-- Great job with your YAML, it looks amazing once knit! -->
 
 The packages used in this project are:
 Rio: @riopackage
@@ -164,6 +165,8 @@ dat %>%
        digits = 2,
        booktabs = TRUE) %>%
  kable_styling()
+
+# This looks great and very clean! I wonder if there is a way to change the title's color to black and center.
 ```
 
 # Examining Survival
@@ -215,6 +218,8 @@ dat %>%
 
 ### Density ridges
 ```{r}
+# I used the code below to switch your labels on the legend (of the first visual). This also seems to change which result is in the front of the 2D illustration. I switched the colors in your code here as well so when I reversed the order you could still have 'saved' in red. But IMO, black looks better in the back, although I could see why it was chosen for 'lost'.
+dat$survived <- factor(dat$survived, levels = rev(levels(dat$survived)))
 surv_classhist <- dat %>% 
    filter(category == "Passenger") %>% 
    filter(!is.na(age)) %>% 
@@ -226,8 +231,8 @@ surv_classhist <- dat %>%
    theme_minimal() +
    theme(plot.title = element_text(hjust = 0.5))
 
-surv_classhist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
-
+surv_classhist + scale_fill_manual(name = "Survival", values = c("dark red","black"))
+# Consider renaming the legend of 'Survival' since 'lost' is under it. Same with following density plot. How about 'Status' or 'Survival Status'? Love the colors here btw.
 surv_agehist <- dat %>% 
    filter(category == "Passenger") %>% 
    filter(!is.na(age)) %>% 
@@ -254,7 +259,7 @@ surv_ageclass_hist <- dat %>%
    theme(plot.title = element_text(hjust = 0.5))
 
 surv_ageclass_hist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
-
+# Great job with facet_wrap here to combine your first two density plots into one visual with all three variables on survival status.
 ```
 
 ## Predicting survival
@@ -264,6 +269,9 @@ ctree <- ctree(survived ~ gender + class + age, data=datpass)
 
 ```{r, fig.width=12, fig.height=9.25}
 ## Note: We are aware the "saved" and "lost" labels are switched in the first graph and are working to figure out why.
+
+# I gave a suggestion on the how I interpreted your comment above. If I interpreted incorrectly, and you don't like my suggestions, no worries! Trash them.
+
 plot(ctree)
 
 ggparty(ctree) +
@@ -276,6 +284,9 @@ ggparty(ctree) +
                                xlab("Survival"), ylab("Percentage")),
                  shared_axis_labels = TRUE,
                  legend_separator = TRUE,)
+
+# Super cool visual here! Absolutely love this!! Thanks for showing me these new packages and functions!
+# Is it possible to remove 'survived' at bottom in the legend? Just seems repetitive.
 ```
 
 # Tickets Prices
@@ -343,6 +354,8 @@ fares_tidy <- fares %>%
    names_to = "year",
    names_prefix = "fare_",
    values_to = "price", names_transform = list(year = as.integer))
+
+# Nice use of pivot_longer()!!
 ```
 
 ## Inflation-adjustment plot
@@ -359,6 +372,8 @@ fare_graph <- fares_tidy %>%
    theme_minimal()
 
 ggplotly(fare_graph)
+
+## I'm not seeing the subtitle after knitting or running here. Wonder where it went? But, cool visual, love the colors!
 ```
 
 ```{r echo=FALSE, include=FALSE}
@@ -366,5 +381,5 @@ firstavg1912 <- "$150.00"
 firstavg2021 <- "$4,241.74"
 ```
 When taking inflation rates into consideration, we see that the average price for a first class cabin in 1912 was **`r firstavg1912`**, which today would be **`r firstavg2021`**
-
+<!-- Nice use of inline code! -->
 # **References**
