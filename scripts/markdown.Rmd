@@ -14,6 +14,8 @@ Rio: @riopackage
 Readr: @readrpackage
 Haven: @havenpackage
 
+<!-- Peer review comment: I wonder why you only referred three packages. It'd be a good idea to either comment out packages you aren't using, or referring to all packages you use  -->
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
@@ -23,13 +25,13 @@ library(haven)
 library(here)
 library(tidyverse)
 library(janitor)
-library(plotly)
+#library(plotly)
 library(ggridges)
-library(party)
-library(dplyr)
+#library(party)
+#library(dplyr) Peer review comment: Commenting this out as dplyr is part of tidyverse
 library(kableExtra)
 library(tinytex)
-library(ggparty)
+#library(ggparty)
 ```
 
 # Passengers Data
@@ -50,6 +52,14 @@ dat$class <- as.factor(dat$class)
 dat$survived <- as.factor(dat$survived)
 dat$embarked <- as.factor(dat$embarked)
 dat$disembarked  <- as.factor(dat$disembarked)
+
+#Peer review comment: I appreciate that your team has converted these to factors, it's definitely a best practice!
+
+#Just an idea on how to convert these to factors at once, using lapply() - this inbuilt function apply the same treatment to all elements of a vector. I checked the below code and it works fine!
+
+#cols <- c("gender", "marital_status", "category", "class", "survived", "embarked", "disembarked")
+#dat[cols] <- lapply(dat[cols], as.factor)
+
 
 dat <- dat %>% 
  mutate(nationality2 = case_when(nationality == "English" ~ "English",
@@ -227,6 +237,9 @@ surv_classhist <- dat %>%
    theme(plot.title = element_text(hjust = 0.5))
 
 surv_classhist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
+# Peer review comment: I noticed in your comment below that you want the labels in the legend to come in this order: Saved, Lost. One approach is to add this code `limits = c("Saved", "Lost")` in the scale_fill_manual.
+# scale_fill_manual(name = "Survival", values = c("black","dark red"), limits = c("Saved", "Lost"))
+# This worked, but you'll accordingly have to change the colors you assigned as Saved was coming in black and lost in dark red with this.
 
 surv_agehist <- dat %>% 
    filter(category == "Passenger") %>% 
@@ -255,6 +268,8 @@ surv_ageclass_hist <- dat %>%
 
 surv_ageclass_hist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
 
+# Peer review comment: these bunch of graphs looked very cool!
+
 ```
 
 ## Predicting survival
@@ -264,7 +279,11 @@ ctree <- ctree(survived ~ gender + class + age, data=datpass)
 
 ```{r, fig.width=12, fig.height=9.25}
 ## Note: We are aware the "saved" and "lost" labels are switched in the first graph and are working to figure out why.
-plot(ctree)
+#Peer review comment: When I inspected the str(dat), I noticed that the factor level for survived is lost, saved. Maybe re-assigning factor levels will solve this problem you encountered. 
+
+plot(ctree) 
+
+#Peer review comment: The tree plot was awesome, and a great way to comprehend information. I'd definitely be saving this for future use.
 
 ggparty(ctree) +
   geom_edge() +
@@ -291,6 +310,7 @@ fares$accommodation <- factor(fares$accommodation, levels = c("First-class parlo
 
 ## Calculate inflation
 ```{r}
+#Peer review comment: This section was interesting! I'd love to know where you pulled the inflation details from. :) 
 p1921 <- (17.9/9.7)
 fares$fare_1921 <- p1921*fares$fare_1912
 fares$fare_1921 <- round(fares$fare_1921, 2)
@@ -362,7 +382,7 @@ ggplotly(fare_graph)
 ```
 
 ```{r echo=FALSE, include=FALSE}
-firstavg1912 <- "$150.00"
+firstavg1912 <- "$150.00" #Peer review comment: This number came out to be 1150 for me. You can also do mean(fares$fare_1912) for reproducibility. 
 firstavg2021 <- "$4,241.74"
 ```
 When taking inflation rates into consideration, we see that the average price for a first class cabin in 1912 was **`r firstavg1912`**, which today would be **`r firstavg2021`**
