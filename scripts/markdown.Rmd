@@ -39,6 +39,8 @@ dat <- import(here("data", "dat.csv")) %>%
    clean_names() %>% 
    mutate_all(na_if,"") %>% 
    drop_na(survived, gender, class, age)
+
+# PEER Review Errol: One thing that was tricky when reading through the file was getting a sense of what kind of analysis you were performing - selecting down to the columns you are using for analysis would help me know what part of the dataset I should be looking at. 
 ```
 
 ## Clean data
@@ -50,6 +52,10 @@ dat$class <- as.factor(dat$class)
 dat$survived <- as.factor(dat$survived)
 dat$embarked <- as.factor(dat$embarked)
 dat$disembarked  <- as.factor(dat$disembarked)
+
+## PEER Review Errol: Potentially a good opportunity to use across() in addition to Manuel's comment below using Mutate - this is especially helpful if you want to apply the change to all columns. 
+# Example: dat <- dat %>%
+#              mutate(across(1:17),as.factor())
 
 # # PEER Review MV: You could consider using dplyr to recode these new variables and then also creating factors that make more sense for some of the variables that have multiple variables. For example, numbering factors based on frequency for marital status. This probably isn't very helpful but a little cleaner than code above.
 # dat <- dat %>%
@@ -123,6 +129,7 @@ dat <- dat %>%
 
 ## Descriptives
 ```{r, descriptives, results = "asis"}
+# PEER Review Errol: I was not familiar with the results chunk option, that's a nice option to have!
 # Breakdown of passengers by class
 dat %>% 
    group_by(class) %>% 
@@ -227,7 +234,7 @@ dat %>%
        booktabs = TRUE) %>%
    kable_styling()
 
-
+#PEER Review Errol: The descriptives are quite thorough and presented neatly- I especially like that you followed the same structure for each table.
 
 ```
 
@@ -307,6 +314,8 @@ surv_ageclass_hist <- dat %>%
 
 surv_ageclass_hist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
 
+
+# PEER Review Errol: A very tiny quibble, but might consider renaming your variables here from ending with hist! Histograms are discrete data, whereas I think this is continuous? 
 ```
 
 ## Predicting survival
@@ -321,6 +330,8 @@ ctree <- ctree(survived ~ gender + class + age, data=modeldat)
 plot(ctree)
 
 # PEER Review MV: I am not at all familiar with the ctree command or what it is doing but it appears to be predicting survival rates for each combination of categories as you go down the flowcharts. However, I'm not sure why class appears twice at different levels. If I follow the left most line, it makes sense that female and first class would have highest probability of save rate. But not sure why class appears twice along the same hierarchy. There must be some reasoning behind this but it will be important to clearly explain this in the final write up.
+
+#PEER Review Errol: Wow this is cool! I have no idea what a ctree is (google says Conditional Interference Tree? Which means almost nothing to me, but it's a great graphic to include!)
 ```
 
 
