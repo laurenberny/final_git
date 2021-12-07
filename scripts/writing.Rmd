@@ -162,6 +162,10 @@ fares_tidy <- fares %>%
    names_prefix = "fare_",
    values_to = "price", names_transform = list(year = as.integer))
 
+fares_tidy_wide <- fares_tidy %>%
+   pivot_wider(names_from = "accommodation",
+               values_from = "price")
+
 ## Inflation-adjustment plot
 fare_graph <- fares_tidy %>% 
    ggplot(aes(year, price, colour=accommodation)) +
@@ -180,7 +184,7 @@ fare_graph <- fares_tidy %>%
 On April 14th, 1912, on its maiden voyage, the Titanic struck an iceberg. Two hours and 40 minutes later, approximately 62% of the passengers perished. Prior research has attempted to determine the characteristics of those who survived the sinking of the Titanic compared to those who died in order to better which attributes were prioritized for determining a life and death situation during that era. The purpose of this study is to further explore the most popular characteristics--class, gender, and age--using descriptive statistics, data visualization, and predictive models (e.g., logistic regression and conditional inference classification trees). Logistic regression results indicate that all three demographic attributes are significant predictors of survival. However, classification tree results suggest that gender had the largest effect on survival, followed subsequently by class. Interestingly, age was only a significant differentiating attribute between males.
 
 # Introduction
-**Work in brief statement about class system, passengers, and voyage.**
+
 ```{r}
 dat %>% 
    group_by(class) %>% 
@@ -196,7 +200,7 @@ dat %>%
 The Titanic was a British cruise liner that featured the most advanced technology available in 1912 but collided with an iceberg just before midnight and sank in the 2-degree Celsius North Atlantic Ocean on its maiden voyage and killed over two-thirds of the passengers and crew onboard (Balakumar et al., 2019; Frey et al., 2011; Hall, 1986). There are many documented factors that contributed to so many of the passengers and crew perishing on the Titanic. There were not enough lifeboats on board. The Titanic included twenty lifeboats which was only enough room for 52% of passengers on board at that time (Frey et al., 2011; Hall, 1986; Symanzik et al., 2019) and a portion of lifeboats launched were not full (Frey et al., 2011; Symanzik et al., 2019). Those who did not get a seat in a lifeboat were sure to perish due to the frigid ocean temperature (Hall, 1986; Frey et al., 2011) and the lower probability of being saved as it’s reported that partially full lifeboats that were lowered made no attempt to save people from the water (Hall, 1986). In addition to the media created based on the Titanic disaster, there have also been datasets released which provide information about the passengers and crew on the Titanic including their sex, age, nationality, ticket fare, social class, ticket number, passenger or crewmember status, parent status, sibling status, spouse status, and port of embarkation (Balakumar et al., 2019). This has enabled researchers to determine who was on the Titanic and whether any of these variables were significant predictors of survival or death. 
 
 The Titanic took approximately two hours and forty minutes to sink to the bottom of the ocean which is a lengthier amount of time compared to some other maritime disasters such as the Lusitania which took only about 18 minutes to sink to the bottom of the ocean after being struck by a torpedo (Frey et al., 2011). It has been hypothesized that this longer amount of time between the Titanic being struck and sinking completely left room for social patterns to operate rather than more selfish interests as in the Lusitania where passengers may have felt more of a fight-or-flight response to more imminent danger (Frey et al., 2011). For example, evacuating women and children before men was a social norm and code of conduct in 1912 (Farag & Hassan, 2018). It has also been documented that Captain Edward Smith had shouted, “Women and children first” after the Titanic collided with the iceberg (Farag & Hassan, 2018). This length of time may have also given an advantage to the first-class passengers compared to the second- and third-class passengers, and to the second-class passengers compared to the third-class passengers, due to a higher likelihood of these passengers giving commands and the crewmembers listening, as well as their financial means to bargain with crewmembers (Frey et al., 2011). 
-**NOTE: Wealth Gap here - Inline text now optional**
+
 ```{r echo=FALSE, include=FALSE}
 firstavg1912 <- "$150.00"
 firstavg2021 <- "$4,241.74"
@@ -267,7 +271,7 @@ Data analysis was performed using RStudio: Integrated Development Environment fo
 # Results
 
 ## Descriptive Statistics of Survival
-**OVERALL...**
+
 ```{r}
 dat %>% 
    group_by(survived) %>% 
@@ -319,7 +323,7 @@ dat %>%
        booktabs = TRUE) %>%
  kable_classic(full_width = F, html_font = "Cambria")
 ```
-Furthermore, age was also an important factor that contributed to survival. As shown in the figure below, age...**Something here**
+Furthermore, age was also an important factor that contributed to survival as shown in the figure below.
 ```{r include=FALSE, warnings=FALSE, message=FALSE}
 surv_ageclass_hist <- dat %>% 
    ggplot(aes(age, gender)) +
@@ -330,7 +334,7 @@ surv_ageclass_hist <- dat %>%
    theme_minimal() +
    theme(plot.title = element_text(hjust = 0.5))
 
-surv_ageclass_hist <- surv_ageclass_hist + scale_fill_manual(name = "Survival", values = c("black","dark red"))
+surv_ageclass_hist <- surv_ageclass_hist + scale_fill_manual(name = "Survival", values = c("black","red"))
 ```
 
 ```{r fig.width=8, fig.height=6}
@@ -363,7 +367,6 @@ The figure below shows the results of the conditional classification tree used t
 8. Second and third-class males, older than nine years of age
 The terminal nodes' barplots indicate the breakdown of survival for each subgroup (black = survival, gray = loss of life). Each gender was stratified by class, suggesting that class was an important predictor of survival for both males and females. However, class had much smaller effect in women (*p* = .044) than men (*p* <.001). Female subgroups were not split by age, whereas all male subgroups were split by age following class, which indicates that age had a larger effect among males than females. Furthermore, the age split for first-class males (54 years of age) is substantially larger than the age split among second and third-class males (nine years of age), which aligns with the wider age distribution of first-class males previously observed in the density ridge graphs. Interestingly, second and third-class males over the age of nine were not split by class. When examining the model as a whole, the base node was gender (*p* < .001), suggesting it was the greatest predictor of survival entered into the model. Thus, based on these order of the tree splits, one can hypothesize that gender was the largest predictor of survival, followed by class and age, respectively.
 ```{r include=FALSE}
-library(party)  
 ctree <- ctree(survived~., data=modeldat)
 ```
 
@@ -372,6 +375,29 @@ plot(ctree, main = "Predicting Survival From Gender, Class, and Age")
 ```
 
 # Discussion
-**NEEDS FINISHED**
+(Shawn McWeeney)
 
 # References
+(Shawn McWeeney was tasked with inputting the APA citations into R)
+
+# **References**
+
+For this project, we used several packages. These included Rio  @riopackage, Readr @readrpackage, Here @herepackage, Tidyverse @tidyversepackage, Janitor @janitorpackage, Plotly @plotlypackage, Kableextra @kableExtrapackage, Ggridges @ggridgespackage, and Party @partypackage. The statistical computing software we used is R @rsoftware.
+
+Dieckmann, C. (2020). The Mystery of the Titanic: What Really Happened. URJ-UCCS: Undergraduate Research Journal at UCCS, 13(1), Article 1. https://urj.uccs.edu/index.php/urj/article/view/491).
+
+Frey, B. S., Savage, D. A., & Torgler, B. (2010). Interaction of natural survival instincts and internalized social norms exploring the Titanic and Lusitania disasters. Proceedings of the National Academy of Sciences of the United States of America, 107(11), 4862–4865. https://doi.org/10.1073/pnas.0911303107.
+
+Frey, B. S., Savage, D. A., & Torgler, B. (2011). Behavior under Extreme Conditions: The Titanic Disaster. Journal of Economic Perspectives, 25(1), 209–222. https://doi.org/10.1257/jep.25.1.209).
+
+Frey, B. S., Savage, D. A., & Torgler, B. (2011). Who perished on the Titanic? The importance of social norms. Rationality and Society, 23(1), 35–49. https://doi.org/10.1177/1043463110396059. 
+
+Farag, N., & Hassan, G. (2018). Predicting the Survivors of the Titanic Kaggle, Machine Learning From Disaster. Proceedings of the 7th International Conference on Software and Information Engineering, 32–37. https://doi.org/10.1145/3220267.3220282.
+
+Hothorn, T., Hornik, K., & Zeileis, A. (2006). Unbiased recursive partitioning: A conditional inference framework. Journal of Computational and Graphical Statistics, 15(3), 651-674.
+
+Hall, W. (1986). Social class and survival on the SS Titanic. Social Science & Medicine, 22(6), 687-690. https://doi.org/10.1016/0277-9536(86)90041-9.
+
+Lassieur, A. (2012). Can You Survive the Titanic? An Interactive Survival Adventure. Horn Book Magazine, 88(2), 139–139.
+
+Takis, S. L. (1999). Titanic: A statistical exploration. The Mathematics Teacher, 92(8), 660-664. 
