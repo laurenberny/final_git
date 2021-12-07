@@ -9,11 +9,6 @@ output:
 bibliography: references.bib
 ---
 
-The packages used in this project are:
-Rio: @riopackage
-Readr: @readrpackage
-Haven: @havenpackage
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
@@ -377,12 +372,11 @@ plot(ctree, main = "Predicting Survival From Gender, Class, and Age")
 # Discussion
 (Shawn McWeeney)
 
-# References
-(Shawn McWeeney was tasked with inputting the APA citations into R)
-
 # **References**
 
 For this project, we used several packages. These included Rio  @riopackage, Readr @readrpackage, Here @herepackage, Tidyverse @tidyversepackage, Janitor @janitorpackage, Plotly @plotlypackage, Kableextra @kableExtrapackage, Ggridges @ggridgespackage, and Party @partypackage. The statistical computing software we used is R @rsoftware.
+
+(Shawn McWeeney was tasked with inputting the APA citations into R)
 
 Dieckmann, C. (2020). The Mystery of the Titanic: What Really Happened. URJ-UCCS: Undergraduate Research Journal at UCCS, 13(1), Article 1. https://urj.uccs.edu/index.php/urj/article/view/491).
 
