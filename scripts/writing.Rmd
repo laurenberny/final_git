@@ -374,6 +374,8 @@ plot(ctree, main = "Predicting Survival From Gender, Class, and Age")
 
 For this project, we used several packages. These included  @riopackage, @readrpackage, @herepackage, @tidyversepackage, @janitorpackage, @plotlypackage, @kableExtrapackage, @ggridgespackage, @partypackage, and @gtsummary. The statistical computing software we used is @rsoftware.
 
+(Shawn McWeeney was tasked with inputting the APA citations into R)
+
 Dieckmann, C. (2020). The Mystery of the Titanic: What Really Happened. URJ-UCCS: Undergraduate Research Journal at UCCS, 13(1), Article 1. https://urj.uccs.edu/index.php/urj/article/view/491).
 
 Encyclopedia Titanica. (2021). Titanic people explorer. https://www.encyclopedia-titanica.org/explorer/

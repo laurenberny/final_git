@@ -389,6 +389,8 @@ firstavg2021 <- "$4,241.74"
 ```
 When taking inflation rates into consideration, we see that the average price for a first class cabin in 1912 was **`r firstavg1912`**, which today would be **`r firstavg2021`**
 
-For this project, we used several packages. These included Rio  @riopackage, Readr @readrpackage, Here @herepackage, Tidyverse @tidyversepackage, Janitor @janitorpackage, Plotly @plotlypackage, Kableextra @kableExtrapackage, Ggridges @ggridgespackage, and Party @partypackage
 
 # **References**
+
+For this project, we used several packages. These included Rio  @riopackage, Readr @readrpackage, Here @herepackage, Tidyverse @tidyversepackage, Janitor @janitorpackage, Plotly @plotlypackage, Kableextra @kableExtrapackage, Ggridges @ggridgespackage, and Party @partypackage
+
