@@ -369,7 +369,7 @@ plot(ctree, main = "Predicting Survival From Gender, Class, and Age")
 # Discussion
 **(Shawn McWeeney)**
 
-# **References**
+# References
 **Note: Shawn McWeeney was tasked with inputting the APA citations into R.**
 
 For this project, we used several packages. These included  @riopackage, @readrpackage, @herepackage, @tidyversepackage, @janitorpackage, @plotlypackage, @kableExtrapackage, @ggridgespackage, @partypackage, and @gtsummary. The statistical computing software we used is @rsoftware.
