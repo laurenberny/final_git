@@ -26,19 +26,34 @@ library(gtsummary)
 
 ```{r include = FALSE}
 # Passengers Data & Cleaning
-dat <- import(here("data", "dat.csv")) %>% 
+raw <- import(here("data", "dat.csv")) 
+
+dat <- raw %>% 
    filter(Category=="Passenger") %>% 
    clean_names() %>% 
    mutate_all(na_if,"") %>% 
-   drop_na(survived, gender, class, age)
+   drop_na(survived, gender, class, age) %>% 
+   as_tibble() %>% 
+#this is one way to mutate many variables at one time
+   mutate(across(c(gender:survived, embarked, disembarked), as.factor))
 
-dat$gender <- as.factor(dat$gender)
-dat$marital_status <- as.factor(dat$marital_status)
-dat$category <- as.factor(dat$category)
-dat$class <- as.factor(dat$class)
-dat$survived <- as.factor(dat$survived)
-dat$embarked <- as.factor(dat$embarked)
-dat$disembarked  <- as.factor(dat$disembarked)
+# dat$gender <- as.factor(dat$gender)
+# dat$marital_status <- as.factor(dat$marital_status)
+# dat$category <- as.factor(dat$category)
+# dat$class <- as.factor(dat$class)
+# dat$survived <- as.factor(dat$survived)
+# dat$embarked <- as.factor(dat$embarked)
+# dat$disembarked  <- as.factor(dat$disembarked)
+
+# it looks like you wanted to combine all "multiple" nationalities into "Other - Multiple" and leave the rest unchanged? If this is the case, the code below might do it. Basically, any nationality that has a comma, recode to Other, if it is Unknown, make missing, else keep as nationality
+
+# dat %>%
+#    mutate(nationality2 = case_when(
+#           str_detect(nationality, ",") ~ "Other - Multiple",
+#           nationality == "Unknown" ~ NA_character_,
+#           TRUE ~ nationality
+#             )
+#           )
 
 dat <- dat %>% 
  mutate(nationality2 = case_when(nationality == "English" ~ "English",
@@ -88,8 +103,8 @@ dat <- dat %>%
    nationality == "Guyanese" ~ "Guyanese",
    nationality == "Haitian" ~ "Haitian",
    nationality == "Syrian,Lebanese" ~ "Syrian/Lebanese",
-   nationality == "Unknown" ~ "Unknown",
-   TRUE ~ "Other - Multiple", ))
+   nationality == "Unknown" ~ NA_character_,
+   TRUE ~ "Other - Multiple"))
 
 dat <- dat %>% 
    mutate(nationality2 = ifelse(nationality2 == "Unknown", NA, nationality2))
@@ -98,13 +113,18 @@ dat <- dat %>%
 ```{r include=FALSE}
 ## Load data
 fares <- import(here("data", "avgfare.csv")) %>% 
-   clean_names()
+   clean_names() %>% 
+   mutate(accommodation = fct_relevel(accommodation,
+                                      "First-class parlor suite", 
+                                      "First-class cabin", 
+                                      "Second-class cabin", 
+                                      "Third-class cabin"))
 
-fares$accommodation <- as.factor(fares$accommodation)
-fares$accommodation <- factor(fares$accommodation, levels = c("First-class parlor suite", "First-class cabin", "Second-class cabin", "Third-class cabin"))
+# fares$accommodation <- as.factor(fares$accommodation)
+# fares$accommodation <- factor(fares$accommodation, levels = c("First-class parlor suite", "First-class cabin", "Second-class cabin", "Third-class cabin"))
 
 # Calculate inflation
-p1921 <- (17.9/9.7)
+p1921 <- (17.9/9.7) 
 fares$fare_1921 <- p1921*fares$fare_1912
 fares$fare_1921 <- round(fares$fare_1921, 2)
 
@@ -152,7 +172,8 @@ fares_tidy <- fares %>%
    pivot_longer(cols = starts_with("fare"),
    names_to = "year",
    names_prefix = "fare_",
-   values_to = "price", names_transform = list(year = as.integer))
+   values_to = "price", 
+   names_transform = list(year = as.integer))
 
 fares_tidy_wide <- fares_tidy %>%
    pivot_wider(names_from = "accommodation",
@@ -166,6 +187,7 @@ fare_graph <- fares_tidy %>%
    scale_colour_brewer(palette="Spectral") +
    facet_wrap(~ accommodation, 4, scales = "free") +
    xlim(1912,2021) +
+   scale_y_continuous(labels=scales::dollar_format()) + #this formats the y axis
    theme(panel.spacing = unit(1, "lines")) +
    labs(y = "Price ($USD)", x = "Year", title = "Inflation-Adjusted Titanic Ticket Prices",
         subtitle = "From 1912 to 2021", colour = "Accommodation") +
@@ -202,8 +224,8 @@ Social status may have played a role that night as the crew would have been more
 
 # Methods
 ## Analytic Sample
-The data utilized for this study is from Encyclopedia Titanica (2021). The data was collected from primary sources, including the ship's manifesto and records. Since the population of interest for this study is passengers who were aboard the Titanic during its sinking, passengers who disembarked at Cherbourg, Queenstown, and Southampton (*n* = 35) as well as crew members (*n* = 1,123) were excluded from the analyses. Missing data was handled through listwise deletion of two participants who did not have their ages recorded. Thus, the analytic sample consisted of **1,315 passengers**. 
-Over half (53.75%) of the Titanic's passengers were in third-class accommodations, whereas 24.64% and 21.60% were in first and second-class, respectively.
+The data utilized for this study is from Encyclopedia Titanica (2021). The data was collected from primary sources, including the ship's manifesto and records. Since the population of interest for this study is passengers who were aboard the Titanic during its sinking, passengers who disembarked at Cherbourg, Queenstown, and Southampton (*n* = 35) as well as crew members (*n* = `r format(sum(raw$Category == "Crew"), big.mark=",")`) were excluded from the analyses. Missing data was handled through listwise deletion of two participants who did not have their ages recorded. Thus, the analytic sample consisted of **`r format(nrow(dat), big.mark=",") passengers**. 
+Over half (`r round(sum(dat$class == "3rd Class")/nrow(dat)*100)`%) of the Titanic's passengers were in third-class accommodations, whereas 24.64% and 21.60% were in first and second-class, respectively.
 ```{r}
 dat %>% 
    group_by(class) %>% 
@@ -216,7 +238,7 @@ dat %>%
        booktabs = TRUE) %>%
   kable_classic(full_width = F, html_font = "Cambria")
 ```
-Across all passengers, the ages ranged from 0-74 years (*M* = 31.42, *SD* = 13.92). The table below shows the distribution of age by each class. The average age in first-class was substantially older than both second and third-class. This may suggest that the trip served a different purpose for that group of passengers, such as recreation and experience versus business travels and immigration (Hall, 1986).
+Across all passengers, the ages ranged from 0-74 years (*M* = `r mean(dat$age)` <!-- I found a different mean -->, *SD* = 13.92). The table below shows the distribution of age by each class. The average age in first-class was substantially older than both second and third-class. This may suggest that the trip served a different purpose for that group of passengers, such as recreation and experience versus business travels and immigration (Hall, 1986).
 ```{r}
 dat %>% 
    group_by(class) %>% 
@@ -228,14 +250,16 @@ dat %>%
        booktabs = TRUE) %>%
   kable_classic(full_width = F, html_font = "Cambria")
 ```
-The table below shows the list of nationalities reported by the Titanic's passengers. The majority of the passengers where English (22.43%), American (18.40%), and Irish (9.28%). The majority of first-class passengers were American (60.19%), whereas the majority of second-class passengers were English (51.06%). Third-class passengers were the most diverse class, with the most popular nationalities being English (15.84%), Irish (14.85%), Swedish	(12.73%), and Syrian/Lebanese	(11.74%). The difference in nationalities were likely due to the large number of individuals in third-class who were immigrating to American (Hall, 1986).
+The table below shows the list of nationalities reported by the Titanic's passengers. The majority of the passengers where English (22.43%), American (18.40%), and Irish (9.28%). The majority of first-class passengers were American (60.19%), whereas the majority of second-class passengers were English (51.06%). Third-class passengers were the most diverse class, with the most popular nationalities being English (15.84%), Irish (14.85%), Swedish	(12.73%), and Syrian/Lebanese (11.74%). The difference in nationalities were likely due to the large number of individuals in third-class who were immigrating to American (Hall, 1986).
 ```{r}
 dat %>% 
    filter(!is.na(nationality2)) %>% 
    group_by(nationality2) %>% 
    summarize(count = n()) %>% 
-   mutate(percent = (count/sum(count))*100) %>% 
+   mutate(percent = round((count/sum(count))*100)) %>% 
    arrange(desc(percent)) %>%
+  # select(Nationality = nationality2, Count = count, Percent = percent) %>% 
+  # DT::datatable()
    kable(caption = "Breakdown of Passenger Nationalities",
        col.names = c("Nationality", "Count", "Percent"),
        digits = 2,
@@ -338,7 +362,7 @@ tbl_m1 <- tbl_regression(m1, exponentiate = TRUE, intercept=FALSE)
 ```
 
 ## Logistic Regression Model
-Results of the main effects logistic regression model predicting survival are shown in the table below. When controlling for the effects of gender and class, age was a significant predictor of survival (*OR* = .97, 95% CI [0.95, 0.98], *p* < .001). With each additional year in age, passengers' odds of survival decreased by three percent. When controlling for the effects of age and gender, class affiliation was a significant predictor of survival. Compared to first-class passengers, second-class passengers'  (*OR* = .27, 95% CI [0.18, 0.40], *p* < .001) and third-class passengers' (*OR* = .10, 95% CI [0.07, 0.15], *p* < .001) odds of surviving the disaster were 73% lower and 90% lower, respectively. Gender was also a significant predictor of survival (*OR* = .08, 95% CI [0.06, 0.11], *p* < .001), even when controlling for class and age. Male passengers faced 92% lower odds of survival compared to female passengers. Taken together, these results confirm that--even when controlling for one another--class, age, and gender significantly affected survival rates.
+Results of the main effects logistic regression model predicting survival are shown in the table below. When controlling for the effects of gender and class, age was a significant predictor of survival (*OR* = `r filter(tbl_m1$table_body, variable == "age") %>% pull(estimate) %>% round(., 2)`, 95% CI [0.95, 0.98], *p* < .001). With each additional year in age, passengers' odds of survival decreased by three percent. When controlling for the effects of age and gender, class affiliation was a significant predictor of survival. Compared to first-class passengers, second-class passengers'  (*OR* = .27, 95% CI [0.18, 0.40], *p* < .001) and third-class passengers' (*OR* = .10, 95% CI [0.07, 0.15], *p* < .001) odds of surviving the disaster were 73% lower and 90% lower, respectively. Gender was also a significant predictor of survival (*OR* = .08, 95% CI [0.06, 0.11], *p* < .001), even when controlling for class and age. Male passengers faced 92% lower odds of survival compared to female passengers. Taken together, these results confirm that--even when controlling for one another--class, age, and gender significantly affected survival rates.
 
 ```{r}
 tbl_m1
